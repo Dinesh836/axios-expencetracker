@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <form onsubmit="saveToLocalStorage(event)">
+        <label for="ammount">Ammount:</label><br>
+        <input type="number" id="ammount" name="Ammount" required><br>
+        <label for="reason">Reason:</label><br>
+        <input type="text" id="reason" name="Reason" required><br>
+        <button id="btn">Add Expence</button>
+    </form>
+    <ul id="list"></ul>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.27.2/axios.min.js"></script>
+    <script>
+        function saveToLocalStorage(event) {
+            event.preventDefault();
+            const amnt = event.target.Ammount.value;
+            
+            const obj={
+                amnt
+            }
+            axios.post("https://crudcrud.com/api/05ba0bbfa90a4c75b546f5370d5c7fe2/expence-tracker" , obj)
+            .then((res)=>{
+                console.log(res);
+            })
+            .catch((err)=>{
+                console.log(err);
+            })
+            listOfExpence(obj);
+        }
+       window.addEventListener("DOMContentLoader", () =>{
+           axios.get("https://crudcrud.com/api/05ba0bbfa90a4c75b546f5370d5c7fe2/expence-tracker")
+           .then((res) =>{
+               for(var i=0;i<res.data.length ;i++){
+                listOfExpence(res.data[i]);
+               }
+           })
+           .catch((err)=>{
+               console.log(err)
+           })
+       })
+
+        function listOfExpence(loe){
+            const parentNode=document.getElementById('list');
+            const childHTML=`<li id=${loe._id}> ${loe.amnt} 
+                <button onclick=editdata('${loe.amnt}')> Edit </button> 
+                 <button onclick=deletedata('${loe.amnt}')> Delete </button>
+                                     </li>`;
+            parentNode.innerHTML=parentNode.innerHTML+childHTML
+        }
+           
+        function deletedata(amntId){
+            axios.delete(`https://crudcrud.com/api/05ba0bbfa90a4c75b546f5370d5c7fe2/expence-tracker/${amntId}`)
+            .then((res)=>{
+                removeFromDash(amntId)
+            })
+            .catch((err)=>{
+                console.log(err);
+            })
+            removeFromDash(amntId)
+        }
+            function removeFromDash(amntId){
+                const parentNode=document.getElementById("list");
+                const childNode=document.getElementById(amntId);
+                parentNode.removeChild(childNode);
+            }
+            function editFromDash(amntId){
+                axios.put=(`https://crudcrud.com/api/05ba0bbfa90a4c75b546f5370d5c7fe2/expence-tracker/${amntId}`)
+                .then((res)=>{
+                    document.getElementById('ammount').value=amnt ;
+                deletedata(amntId);
+                })
+                .catch((err)=>{
+                    console.log(err)
+                })
+                
+            }
+    </script>
+</body>
+
+</html>
